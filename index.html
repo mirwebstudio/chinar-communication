@@ -6,7 +6,7 @@
 <title>Chinar Communication — Phones, Laptops, Watches &amp; Audio · Srinagar</title>
 <meta name="description" content="Chinar Communication, Bemina, Srinagar. Phones, laptops, watches, audio and accessories with EMI on all credit cards and finance on all new Android phones.">
 <meta name="theme-color" content="#ffffff">
-<!-- Favicon using the provided logo -->
+<!-- Favicon -->
 <link rel="icon" type="image/png" href="chinar-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,9 +102,20 @@ textarea{height:auto;padding:12px 14px;resize:vertical;min-height:110px}
 .nav-in{max-width:var(--maxw);margin:0 auto;height:100%;padding:0 16px;display:flex;align-items:center;gap:8px}
 @media(min-width:768px){.nav-in{padding:0 32px}}
 
-/* ================= UPDATED LOGO STYLES ================= */
+/* ================= LOGO STYLES ================= */
 .logo{display:flex;align-items:center;gap:12px;text-decoration:none;line-height:1.1}
-.logo-img{display:block;height:40px;width:40px;border-radius:50%;object-fit:cover;border:1px solid var(--line);background:#fff;flex:none}
+.logo-img{
+  display:block;
+  height:40px;
+  width:40px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid var(--line);
+  background:#fff;
+  flex:none;
+  font-size:0; /* Hides alt text if the image breaks */
+  color:transparent;
+}
 .logo-text{display:flex;flex-direction:column;justify-content:center}
 .logo-text .main{font-size:1.1rem;font-weight:800;letter-spacing:.05em;color:var(--ink);line-height:1.1}
 .logo-text .sub{font-size:.55rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin-top:2px}
@@ -113,7 +124,6 @@ textarea{height:auto;padding:12px 14px;resize:vertical;min-height:110px}
   .logo-text .main{font-size:.95rem}
   .logo-text .sub{font-size:.5rem}
 }
-/* ======================================================== */
 
 .nav-links{display:none;align-items:center;gap:2px;margin-left:24px}
 @media(min-width:1024px){.nav-links{display:flex}}
@@ -331,7 +341,21 @@ details.faq p{color:var(--ink-2);font-size:.92rem;padding-bottom:18px;max-width:
 .footer h4{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:14px;font-weight:600}
 .footer a{display:block;font-size:.9rem;color:var(--ink-2);text-decoration:none;padding:5px 0}
 .footer a:hover{color:var(--ink)}
-.foot-logo{display:block;height:48px;width:48px;border-radius:50%;object-fit:cover;margin-bottom:14px;border:1px solid var(--line);background:#fff}
+
+/* ================= FOOTER LOGO FIX ================= */
+.foot-logo{
+  display:block;
+  height:48px;
+  width:48px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-size:0; /* Hides broken alt text */
+  color:transparent;
+}
+
 .foot-bottom{margin-top:44px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:.78rem;color:var(--ink-3)}
 .socials{display:flex;gap:8px;margin-top:14px}
 .socials a{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;background:#fff;padding:0}
@@ -389,7 +413,20 @@ details.faq p{color:var(--ink-2);font-size:.92rem;padding-bottom:18px;max-width:
   box-shadow:var(--shadow);display:grid;gap:24px;align-items:center}
 @media(min-width:800px){.profile-card{grid-template-columns:auto 1fr auto;padding:32px 40px;gap:36px}}
 .profile-card .avatar{width:112px;height:112px;border-radius:50%;padding:4px;background:var(--grad-gold);margin:0 auto;overflow:hidden}
-.profile-card .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;background:#fff;border:4px solid #fff}
+
+/* ================= PROFILE CARD AVATAR FIX ================= */
+.profile-card .avatar img{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  object-fit:cover;
+  background:#fff;
+  border:4px solid #fff;
+  overflow:hidden;
+  font-size:0; /* Hides broken alt text */
+  color:transparent;
+}
+
 .p-name{font-size:1.5rem;font-weight:700;letter-spacing:-.025em;display:flex;align-items:center;gap:8px;justify-content:center}
 @media(min-width:800px){.p-name{justify-content:flex-start}}
 .verified{width:20px;height:20px;color:#2F7BFF}
@@ -470,7 +507,7 @@ details.faq p{color:var(--ink-2);font-size:.92rem;padding-bottom:18px;max-width:
     
     <!-- UPDATED LOGO AREA -->
     <a class="logo" href="#/" aria-label="Chinar Communication — home">
-      <img src="chinar-logo.png" alt="Chinar Communication Logo" class="logo-img">
+      <img src="chinar-logo.png" alt="" class="logo-img">
       <div class="logo-text">
         <span class="main">CHINAR</span>
         <span class="sub">COMMUNICATION</span>
@@ -555,7 +592,7 @@ details.faq p{color:var(--ink-2);font-size:.92rem;padding-bottom:18px;max-width:
     <div class="foot-grid">
       <div>
         <a class="logo" href="#/" style="margin-bottom:14px">
-          <img src="chinar-logo.png" alt="Chinar Communication" class="foot-logo">
+          <img src="chinar-logo.png" alt="" class="foot-logo">
         </a>
         <p class="muted" style="max-width:30ch">Where technology meets trust. Bemina, Srinagar — since 2020.</p>
         <div class="socials">
@@ -836,7 +873,7 @@ function profileHeader(){
   <section class="profile">
     <div class="wrap">
       <div class="profile-card" data-reveal>
-        <div class="avatar"><img src="chinar-logo.png" alt="Chinar Communication"></div>
+        <div class="avatar"><img src="chinar-logo.png" alt=""></div>
         <div>
           <h2 class="p-name">Chinar Communication
             <svg class="verified" viewBox="0 0 24 24" fill="currentColor" aria-label="Verified store"><path d="M12 2l2.4 2 3.1-.3 1 3 2.8 1.5-.9 3 .9 3-2.8 1.5-1 3-3.1-.3L12 22l-2.4-2-3.1.3-1-3L2.7 15.8l.9-3-.9-3L5.5 8.3l1-3 3.1.3L12 2Zm-1.2 13.4 5-5-1.1-1.1-3.9 3.9-1.7-1.7-1.1 1.1 2.8 2.8Z"/></svg>
@@ -1333,7 +1370,7 @@ function adminLoginPage(){
   <section class="page">
     <div class="wrap">
       <div class="auth">
-        <img src="chinar-logo.png" alt="Chinar Communication" style="display:block;height:56px;width:56px;border-radius:50%;object-fit:cover;border:1px solid var(--line);margin-bottom:24px">
+        <img src="chinar-logo.png" alt="" style="display:block;height:56px;width:56px;border-radius:50%;object-fit:cover;border:1px solid var(--line);margin-bottom:24px;font-size:0;color:transparent;">
         <h1 class="h-l">Owner login</h1>
         <p class="muted">Manage the store catalogue. This is separate from customer browsing.</p>
         <form id="adminLoginForm" style="margin-top:24px" novalidate>
