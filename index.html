@@ -6,7 +6,47 @@
 <title>Chinar Communication — Phones, Laptops, Watches &amp; Audio · Srinagar</title>
 <meta name="description" content="Chinar Communication, Bemina, Srinagar. Phones, laptops, watches, audio and accessories with EMI on all credit cards and finance on all new Android phones.">
 <meta name="theme-color" content="#ffffff">
-<!-- Favicon -->
+<link rel="canonical" href="https://chinarcommunication.com/">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://chinarcommunication.com/">
+<meta property="og:title" content="Chinar Communication — Premium Tech Store in Srinagar">
+<meta property="og:description" content="Phones, laptops, watches and audio with EMI on all credit cards. Visit us in Bemina, Srinagar.">
+<meta property="og:image" content="https://ikhavxmzvtfnwihrsodu.supabase.co/storage/v1/object/public/product-images/chinar-logo.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://chinarcommunication.com/">
+<meta property="twitter:title" content="Chinar Communication — Premium Tech Store in Srinagar">
+<meta property="twitter:description" content="Phones, laptops, watches and audio with EMI on all credit cards. Visit us in Bemina, Srinagar.">
+<meta property="twitter:image" content="https://ikhavxmzvtfnwihrsodu.supabase.co/storage/v1/object/public/product-images/chinar-logo.png">
+
+<!-- Structured Data (LocalBusiness) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MobilePhoneStore",
+  "name": "Chinar Communication",
+  "image": "https://ikhavxmzvtfnwihrsodu.supabase.co/storage/v1/object/public/product-images/chinar-logo.png",
+  "url": "https://chinarcommunication.com/",
+  "telephone": "+919797333633",
+  "priceRange": "₹₹",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "JB Tower, Bemina Degree College Road, near KFC, Housing Colony",
+    "addressLocality": "Srinagar",
+    "addressRegion": "Jammu & Kashmir",
+    "postalCode": "190018",
+    "addressCountry": "IN"
+  },
+  "sameAs": [
+    "https://www.instagram.com/chinarcommunication",
+    "https://wa.me/919797333633"
+  ]
+}
+</script>
+
 <link rel="icon" type="image/png" href="chinar-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -699,14 +739,14 @@ function waLink(message){
 /* ------------------------------------------------------- product helpers -- */
 function normalizeProduct(p){
   return {
-    id: p.id,
-    name: p.name || 'Untitled product',
-    brand: p.brand || '',
+    id: p.id || Math.random().toString(36).substr(2, 9),
+    name: String(p.name || 'Untitled product'),
+    brand: String(p.brand || ''),
     price: Number(p.price) || 0,
-    description: p.description || '',
+    description: String(p.description || ''),
     category: String(p.category || 'uncategorized').toLowerCase(),
     stockStatus: String(p.stock_status || 'in_stock').toLowerCase(),
-    photoLink: p.photo_link || '',
+    photoLink: String(p.photo_link || ''),
     specifications: p.specifications,
     createdAt: p.created_at ? new Date(p.created_at).getTime() : 0,
     _raw: p
@@ -763,30 +803,29 @@ function renderSpecs(specs){
 const ProductStore = {
   items: [],
   loaded: false,
-  loading: false,
   error: null,
+  loadPromise: null,
   async load(force){
     if (this.loaded && !force) return this.items;
-    if (this.loading) {
-      while (this.loading) await new Promise(r => setTimeout(r, 30));
-      if (this.error) throw this.error;
+    if (this.loadPromise) return this.loadPromise;
+
+    this.loadPromise = (async () => {
+      try {
+        const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        this.items = (data || []).map(normalizeProduct);
+        this.loaded = true;
+        this.error = null;
+      } catch (e) {
+        this.error = e;
+        throw e;
+      } finally {
+        this.loadPromise = null;
+      }
       return this.items;
-    }
-    this.loading = true;
-    this.error = null;
-    try {
-      const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false });
-      if (error) throw error;
-      this.items = (data || []).map(normalizeProduct);
-      this.loaded = true;
-    } catch (e) {
-      this.error = e;
-      this.loaded = true;
-    } finally {
-      this.loading = false;
-    }
-    if (this.error) throw this.error;
-    return this.items;
+    })();
+
+    return this.loadPromise;
   },
   all(){ return this.items; },
   byId(id){ return this.items.find(p => String(p.id) === String(id)); },
@@ -799,7 +838,7 @@ const ProductStore = {
     const set = new Set(this.items.map(p => p.brand).filter(Boolean));
     return Array.from(set).sort();
   },
-  invalidate(){ this.loaded = false; this.items = []; this.error = null; }
+  invalidate(){ this.loaded = false; this.items = []; this.error = null; this.loadPromise = null; }
 };
 
 /* ============================== PAGES ==================================== */
@@ -903,9 +942,14 @@ function brandMarquee(){
 /* ---------------------------------------------------------------- HOME ---- */
 function homePage(){
   const all = ProductStore.all();
+  
+  // Null-safe brand filtering
   const phones = all.filter(p => p.category === 'phones');
-  const apple = all.filter(p => p.brand.toLowerCase() === 'apple');
-  const android = all.filter(p => ['samsung','oneplus','mi','realme','infinix','motorola','redmi'].includes(p.brand.toLowerCase()));
+  const apple = all.filter(p => (p.brand || '').toLowerCase() === 'apple');
+  const android = all.filter(p =>
+    ['samsung','oneplus','mi','realme','infinix','motorola','redmi'].includes((p.brand || '').toLowerCase())
+  );
+  
   const latest = all.slice(0, 4);
   const featured = (phones.length ? phones : all).slice(0, 4);
   const categories = ProductStore.categories();
