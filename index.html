@@ -620,9 +620,9 @@ const CFG = {
 };
 
 // ============================================================================
-// REPLACE 'YOUR-OWNER-UUID-HERE' WITH YOUR ACTUAL UUID FROM SUPABASE AUTH
+// FIXED: Owner UUID is now set correctly
 // ============================================================================
-const OWNER_UUID = 'YOUR-OWNER-UUID-HERE';
+const OWNER_UUID = '817c583a-bf03-429a-af06-1546df39ea9d';
 
 if (!window.supabase) {
   document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;max-width:600px;margin:0 auto"><h1>Could not load Supabase client</h1><p>Check your internet connection and reload the page.</p></div>';
@@ -1419,10 +1419,15 @@ async function adminDashboardHTML(){
             <div class="field"><label for="n-desc">Description</label><textarea id="n-desc" placeholder="Short description shown on cards and the product page."></textarea></div>
             
             <div class="field">
-              <label for="n-photos">Image URLs (Comma separated for multiple) *</label>
-              <textarea id="n-photos" placeholder="https://.../image1.jpg, https://.../image2.jpg" required></textarea>
+              <label for="n-photos">Image URLs (Comma separated)</label>
+              <textarea id="n-photos" placeholder="https://.../image1.jpg, https://.../image2.jpg"></textarea>
             </div>
             
+            <div class="field">
+              <label for="n-file">Or upload images directly</label>
+              <input type="file" id="n-file" accept="image/*" multiple style="font-size:.85rem">
+            </div>
+
             <div class="field"><label for="n-specs">Specifications (one per line, "Label: value")</label>
               <textarea id="n-specs" placeholder="Display: 6.7 inch&#10;Battery: 5000 mAh&#10;Network: 5G"></textarea></div>
             <div class="field">
@@ -1447,6 +1452,18 @@ function parseSpecsText(text){
       return { label: l.slice(0, idx).trim(), value: l.slice(idx + 1).trim() };
     })
     .filter(Boolean);
+}
+
+async function uploadToStorage(file){
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const bucketName = 'CHINAR Communication products';
+  
+  const { error } = await sb.storage.from(bucketName).upload(path, file, { cacheControl: '3600', upsert: false });
+  if (error) throw error;
+  
+  const { data } = sb.storage.from(bucketName).getPublicUrl(path);
+  return data.publicUrl;
 }
 
 async function renderAdmin(app){
@@ -1559,8 +1576,12 @@ function adminDashboardMount(){
     const price = parseInt($('#n-price').value, 10);
     const description = $('#n-desc').value.trim();
     
+    // 1. Get URLs from text area
     const photoText = $('#n-photos').value.trim();
-    const galleryImages = photoText ? photoText.split(',').map(s => s.trim()).filter(Boolean) : [];
+    let galleryImages = photoText ? photoText.split(',').map(s => s.trim()).filter(Boolean) : [];
+    
+    // 2. Handle file uploads
+    const files = $('#n-file').files;
     
     const specs = parseSpecsText($('#n-specs').value);
     const stock = $('#n-stock').value;
@@ -1568,11 +1589,26 @@ function adminDashboardMount(){
     if (!name){ return toast('Enter a product name'); }
     if (!category){ return toast('Enter a category'); }
     if (!price && price !== 0){ return toast('Enter a price'); }
-    if (galleryImages.length === 0){ return toast('Add at least one image URL'); }
 
-    btn.disabled = true; btn.textContent = 'Adding…';
+    btn.disabled = true; 
+    
     try {
-      btn.textContent = 'Saving…';
+      if (files && files.length > 0) {
+        btn.textContent = 'Uploading photos...';
+        for (let i = 0; i < files.length; i++) {
+          const url = await uploadToStorage(files[i]);
+          galleryImages.push(url);
+        }
+      }
+
+      if (galleryImages.length === 0) {
+        toast('Add at least one image URL or file');
+        btn.disabled = false; btn.textContent = 'Add product';
+        return;
+      }
+
+      btn.textContent = 'Saving product...';
+      
       const { error } = await sb.from('products').insert({
         name, brand, category, price,
         description: description || null,
@@ -1581,6 +1617,7 @@ function adminDashboardMount(){
         stock_status: stock,
         specifications: specs.length ? specs : null
       });
+      
       if (error) throw error;
       toast('Product added');
       ProductStore.invalidate();
